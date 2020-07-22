@@ -28,8 +28,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	var error model.Error
 
-	fmt.Println(r.Body)
-
 	json.NewDecoder(r.Body).Decode(&user)
 
 	if user.Email == "" {
@@ -78,8 +76,6 @@ func createToken(user *model.User) (string, error) {
 
 	tokenSting, err := token.SignedString([]byte(secret))
 
-	fmt.Println("tokenString", tokenSting)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,7 +102,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	password := user.Password
-	fmt.Println(password)
 
 	raw := db.Get().Where("email = ?", user.Email).First(&user).Row()
 	err := raw.Scan(&user)
@@ -121,7 +116,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hasedPassword := user.Password
-	fmt.Println(hasedPassword)
 
 	err = bcrypt.CompareHashAndPassword([]byte(hasedPassword), []byte(password))
 
@@ -174,7 +168,7 @@ func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 				errorInResponse(w, http.StatusUnauthorized, errorObject)
 				return
 			}
-	
+
 			if token.Valid {
 				// レスポンスを返す
 				next.ServeHTTP(w, r)
